@@ -2,7 +2,7 @@
 
 Hyperion is a 2d orbital mechanics based game written entirely in python. It is designed to use only Python's turtle graphics library and to be as cross compatible as possible. 
 
-# Tutorial
+# How To Play
 
 Welcome to Hyperion!
 
@@ -45,6 +45,6 @@ If you collide with an orbiting body an early termination will occur, this inclu
 
 Due to the unfortunate creation and positioning of the SQX84-CI Black Hole, quasars are not uncommon
 
-    You will receive a warning on the HUD, and the initial jet will give you ample time to manuever out of the way
+You will receive a warning on the HUD, and the initial jet will give you ample time to manuever out of the way
 
-    If you are unfortunate enough to collide with the quasar an early termination will occur
+If you are unfortunate enough to collide with the quasar an early termination will occur
