@@ -1,4 +1,4 @@
-version = ("v0.5.8/7/25")
+version = ("v0.5.8/8/25")
 
 # Credit to TEABOY
 # Feel free to change / improve anything
