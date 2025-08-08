@@ -1,3 +1,5 @@
+version = ("v0.5.8/7/25")
+
 # Credit to TEABOY
 # Feel free to change / improve anything
 import math
@@ -9,22 +11,13 @@ import turtle
 astlist = []
 
 
-windowsizex = 1920
-windowsizey = 1080
+windowsizex = 1600
+windowsizey = 900
 
 G = 0.7  # gravity constant, actually 6.673e-11, but for arcady-ness needs to be *much* higher
 
 print("Hyperion - By TEABOY")
-print("v0.4.3/17/25")
-print()
-time.sleep(0.3)
-print("Use 'WASD' + 'Space' to move, get close to the moon to mine it for fuel")
-print("Use 'r' to reset, 'p' to pause")
-print("If you run out of fuel or crash, you'll die")
-print("As time goes on your ships components will start to be less efficient, watch out!")
-print("Use Alt + F4 to close, Good Luck!")
-print("Starting...")
-time.sleep(0.5)
+print(version)
 
 
 class Game:
@@ -32,7 +25,7 @@ class Game:
 
         # Creating a window screen
         self.wn = turtle.Screen()
-        self.wn.title("Hyperion")
+        self.wn.title("Hyperion " + version)
         self.wn.bgcolor(0, 0, 0)
         screenTk = self.wn.getcanvas().winfo_toplevel()
         screenTk.attributes("-fullscreen", True)
@@ -46,21 +39,20 @@ class Game:
         self.paused = False
         self.resetted = False
         self.classesLoaded = False
+        self.hasStarted = False
 
         # initializing non-menu classes
-        self.ship = Ship(0, 25, 10, -90, "white")
-        self.hud = HUD()
-        self.level = Level()
-        self.effect = Effects()
-
-        self.wn.tracer(0)  # Move to after classes are made for intro animation
-        self.classesLoaded = True
+        
 
         print("Running - Alt + F4 or CTRL-C in terminal to close")
 
         
 
     def mainloop(self):
+
+        if not self.hasStarted:
+            self.menu = StartMenu()
+        
         starttimer = time.time()
 
         # needed to make the game run
@@ -95,10 +87,11 @@ class Game:
                     asto.t.clear()
                     asto.t.hideturtle()
                     astlist.remove(asto)
+                    del(asto)
                 
 
             if random.randint(0, 10) == 1 and astlist.__len__() < 5:
-                astlist.append(Asteroid(self.level.moon.position[0] * (random.randint(9, 11) / 10), self.level.moon.position[1] * (random.randint(9, 11) / 10), random.random() * 4, random.randint(0, 360)))
+                astlist.append(Asteroid(self.level.moon.position[0] * (random.randint(7, 13) / 10), self.level.moon.position[1] * (random.randint(7, 13) / 10), random.random() * 4, random.randint(0, 360)))
 
             # Quasars started here
             if (random.randint(0, 800) == 1) and self.level.quasaring == False:
@@ -128,13 +121,11 @@ class Game:
         if self.classesLoaded:
             self.ship.thrust()
         else:
-            self.menu.select()
+            self.menu.start()
     
     def inputW(self):
         if self.classesLoaded:
             self.ship.prograde()
-        else:
-            self.menu.up()
 
     def inputA(self):
         if self.classesLoaded:
@@ -143,8 +134,6 @@ class Game:
     def inputS(self):
         if self.classesLoaded:
             self.ship.retrograde()
-        else:
-            self.menu.down()
     
     def inputD(self):
         if self.classesLoaded:
@@ -155,10 +144,12 @@ class Game:
         if game.paused:
             game.paused = False
             game.hud.warnmessage = ""
+            self.menu.clear()
         else:
             game.hud.warnmessage = "PAUSED - SCORE: " + str(self.ship.runtime)
             game.hud.onloop()
             game.paused = True
+            self.menu.pauseMenu()
 
     def isejected(self, loc, velocity):
         if (loc[0] > windowsizex / 2 or loc[0] < -windowsizex / 2) or (loc[1] > windowsizey / 2 or loc[1] < -windowsizey / 2) or (velocity > 20):
@@ -191,6 +182,15 @@ class Game:
         game.level.reset()
         game.lagreduce()
         self.hud.warnmessage = " "
+
+    def onstart(self):
+        self.ship = Ship(0, 25, 10, -90, "white")
+        self.hud = HUD()
+        self.level = Level()
+        self.effect = Effects()
+
+        self.wn.tracer(0)  # Move to after classes are made for intro animation
+        self.classesLoaded = True
 
         
 
@@ -353,9 +353,9 @@ class Ship:
         self.t.shapesize(0.2, 0.2, 0.2)
 
         self.e = turtle.Pen()
-        self.e.color(0, .3, 0)
+        self.e.color(0.2, 0.2, 0.2)
         self.e.hideturtle()
-        self.e.width(2)
+        self.e.width(4)
 
         self.m = turtle.Pen()
         self.m.color("yellow")
@@ -788,7 +788,67 @@ class Effects:
                 self.eint = 0
                 self.exploding = False
 
+class StartMenu:
+    def __init__(self):
+        self.selected = 0
+        self.hasStarted = False
+        game.paused = True
+        game.hasStarted = True
 
+        self.t = turtle.Pen()
+        self.t.color("red")
+        self.t.up()
+        self.t.hideturtle()
+        self.t.left(90)
+        self.t.forward(windowsizey / 5)
+        self.t.write("H Y P E R I O N", align="center", font=("Arial", int(windowsizex / 12), "bold", "italic"))   
+
+        self.t.backward(windowsizey / 5)
+        self.t.write("PRESS SPACE TO START", align="center", font=("Arial", int(windowsizex / 75), "bold"))   
+
+        self.t.backward(windowsizey / 3.5)
+        self.t.write("CONTROLS\nW - THRUST PROGRADE\nS - THRUST RETROGRADE\nA/D - ROTATE\nSPACE - THRUST\nP - PAUSE\nR - RESTART\nALT+F4 - QUIT", 
+                    align="center", font=("Arial", int(windowsizex / 85), "bold", "italic"))   
+        
+        self.t.backward(windowsizey / 7)
+        self.t.right(90)
+        self.t.forward(windowsizex / 3)
+        self.t.left(90)
+        self.t.write(version, align="center", font=("Arial", int(windowsizex / 75), "bold"))   
+
+
+
+    def start(self):
+        self.t.clear()
+        game.onstart()
+        self.unpause()
+
+    def unpause(self):
+        self.t.clear()
+        game.paused = False
+    
+    def pauseMenu(self):
+        self.t.goto(0, 0)
+        self.t.forward(windowsizey / 5)
+        self.t.write("H Y P E R I O N", align="center", font=("Arial", int(windowsizex / 15), "bold", "italic"))   
+
+        self.t.backward(windowsizey / 5)
+        self.t.write("PRESS P TO UNPAUSE", align="center", font=("Arial", int(windowsizex / 75), "bold"))   
+
+        self.t.backward(windowsizey / 3.5)
+        self.t.write("CONTROLS\nW - THRUST PROGRADE\nS - THRUST RETROGRADE\nA/D - ROTATE\nSPACE - THRUST\nP - PAUSE\nALT+F4 - QUIT", 
+                    align="center", font=("Arial", int(windowsizex / 85), "bold", "italic"))
+
+        self.t.backward(windowsizey / 7)
+        self.t.right(90)
+        self.t.forward(windowsizex / 3)
+        self.t.left(90)
+        self.t.write(version, align="center", font=("Arial", int(windowsizex / 75), "bold"))   
+
+
+    def clear(self):
+        self.t.clear()   
+        
             
 
 
